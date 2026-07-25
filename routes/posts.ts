@@ -3,15 +3,26 @@ import {prisma} from '../lib/prisma';
 
 export const router=express.Router()
 
-router.get("/posts",async (req,res)=>{
-    const posts=await prisma.post.findMany({
-        orderBy:{id:"desc"},
-        take:20,
-        include:{
-            user:true,
-            comments:true
-        }
+// postApi for games
+ router.post("/games", async(req,res)=>{
+     
+    const gameSchema = z.object({
+        name: z.string().trim().min(1, "Name is required"),
+        description: z.string().trim().optional(),
+        image: z.string().trim().pipe(z.url()),
+        logo: z.string().trim().pipe(z.url()),
+        badge: z.string().trim().pipe(z.url())
     })
-    res.json(posts)
+    const gamedata =gameSchema.parse(req.body);
+     const id=res.locals.game.id;
+   const game = await prisma.post.create({
+      data: {
+    name: gamedata.name,
+    image: gamedata.image,
+    logo: gamedata.logo,
+    badge: gamedata.badge,
+    description: gamedata.description,
+}
+    });
 })
 
