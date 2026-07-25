@@ -1,67 +1,62 @@
-import { prisma } from "../lib/prisma";
-import { faker } from "@faker-js/faker";
-
+import { prisma, Prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
 
 async function main() {
-	console.log("User seeding started...");
+  console.log("Seeding users...");
+  const users: Prisma.UserCreateInput[] = [
+    {
+      name: "Admin User",
+      username: "admin",
+      email: "admin@example.com",
+      role: "ADMIN",
+      password: await bcrypt.hash("admin123", 10),
+    },
+    {
+      name: "Demo User",
+      username: "demo",
+      email: "demo@example.com",
+      role: "USER",
+      password: await bcrypt.hash("demo123", 10),
+    }
+  ];
 
-	await prisma.user.create({
-		data: {
-			name: "Alice",
-			username: "alice",
-			bio: "First users",
-			password: await bcrypt.hash("password", 10),
-		},
-	});
+  for (const user of users) {
+    const existing = await prisma.user.findFirst({ where: { OR: [{ username: user.username }, { email: user.email }] } });
+    if (!existing) {
+      await prisma.user.create({ data: user });
+    }
+  }
 
-	await prisma.user.create({
-		data: {
-			name: "Bob",
-			username: "bob",
-			bio: "Second users",
-			password: await bcrypt.hash("password", 10),
-		},
-	});
+  console.log("Seeding catalog...");
+  const existingGame = await prisma.game.findFirst({ where: { name: "Mobile Legends Ban Ban" } });
+  if (!existingGame) {
+    await prisma.game.create({ data: { name: "Mobile Legends Ban Ban", description: "A fast-paced digital battle arena experience.", image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80", logo: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80", badge: "New" } });
+  }
 
-	for (let i = 0; i < 3; i++) {
-		const firstName = faker.person.firstName();
-		const lastName = faker.person.lastName();
+  const existingApp = await prisma.app.findFirst({ where: { name: "Studio Planner" } });
+  if (!existingApp) {
+    await prisma.app.create({ data: { name: "Studio Planner", description: "Plan launches and content delivery with ease.", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80", logo: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80", badge: "Popular" } });
+  }
 
-		await prisma.user.create({
-			data: {
-				name: `${firstName} ${lastName}`,
-				username: `${firstName}${lastName}`.toLowerCase(),
-				bio: "Second users",
-				password: await bcrypt.hash("password", 10),
-			},
-		});
-	}
-
-	console.log("User seeding done. \n");
-
-	console.log("Post seeding started...");
-	for (let i = 0; i < 20; i++) {
-		await prisma.post.create({
-			data: {
-				content: faker.lorem.paragraph(),
-				userId: faker.number.int({ min: 1, max: 5 }),
-			},
-		});
-	}
-	console.log("Post seeding done. \n");
-
-	console.log("Comment seeding started...");
-	for (let i = 0; i < 40; i++) {
-		await prisma.comment.create({
-			data: {
-				content: faker.lorem.paragraph(),
-				postId: faker.number.int({ min: 1, max: 20 }),
-				userId: faker.number.int({ min: 1, max: 5 }),
-			},
-		});
-	}
-	console.log("Comment seeding done. \n");
+  for (const flag of [
+    { key: "promotions", enabled: true },
+    { key: "new_homepage", enabled: true }
+  ]) {
+    const existingFlag = await prisma.featureFlag.findUnique({ where: { key: flag.key } });
+    if (!existingFlag) {
+      await prisma.featureFlag.create({ data: flag });
+    }
+  }
 }
 
-main();
+main()
+  .then(() => {
+    console.log("Seed complete.");
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
