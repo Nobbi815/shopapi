@@ -25,9 +25,9 @@ app.get("/health", (_req, res) => {
   res.json({ success: true, status: "Backend is running" });
 });
 
-app.use("/auth", authRouter);
-app.use("/users", userRouter);
-app.use("/products", productRouter);
+app.use(authRouter);
+app.use(userRouter);
+app.use(productRouter);
 
 app.use(errorHandler);
 
