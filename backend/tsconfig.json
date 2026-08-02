@@ -12,6 +12,6 @@
     "types": ["node"],
     "verbatimModuleSyntax": false
   },
-  "include": ["index.ts", "api/**/*.ts", "backend/**/*.ts", "prisma.config.ts"],
+  "include": ["src/**/*.ts", "api/**/*.ts", "prisma/**/*.prisma"],
   "exclude": ["node_modules", "generated"]
 }
