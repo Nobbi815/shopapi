@@ -1,14 +1,3 @@
 {
-  "version": 3,
-  "routes": [
-    {
-      "src": "/api(?:/(.*))?$",
-      "dest": "/backend/api/index.ts"
-    }
-  ],
-  "functions": {
-    "backend/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "version": 2
 }

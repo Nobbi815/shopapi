@@ -21,13 +21,13 @@ app.use(
 app.use(express.json());
 app.use(apiLimiter);
 
-app.get("/api/health", (_req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ success: true, status: "Backend is running" });
 });
 
-app.use("/api", authRouter);
-app.use("/api", userRouter);
-app.use("/api", productRouter);
+app.use("/auth", authRouter);
+app.use("/users", userRouter);
+app.use("/products", productRouter);
 
 app.use(errorHandler);
 

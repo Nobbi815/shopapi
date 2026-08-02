@@ -1,12 +1,14 @@
+import express from "express";
 import app from "./backend/src/app";
 import { env } from "./backend/src/config/env";
 
-const port = env.port;
+const server = express();
+server.use("/api", app);
 
 if (!process.env.VERCEL) {
-  app.listen(port, () => {
-    console.log(`Backend running locally at http://localhost:${port}`);
+  server.listen(env.port, () => {
+    console.log(`Backend running locally at http://localhost:${env.port}`);
   });
 }
 
-export default app;
+export default server;
