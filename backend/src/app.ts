@@ -21,6 +21,10 @@ app.use(
 app.use(express.json());
 app.use(apiLimiter);
 
+app.get("/", (_req, res) => {
+  res.json({ success: true, status: "Backend is running" });
+});
+
 app.get("/health", (_req, res) => {
   res.json({ success: true, status: "Backend is running" });
 });

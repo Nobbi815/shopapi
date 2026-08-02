@@ -5,6 +5,10 @@ import { env } from "./backend/src/config/env";
 const server = express();
 server.use("/api", app);
 
+server.get("/", (_req, res) => {
+  res.json({ success: true, message: "Backend API is running. Use /api/auth, /api/users, /api/products." });
+});
+
 if (!process.env.VERCEL) {
   server.listen(env.port, () => {
     console.log(`Backend running locally at http://localhost:${env.port}`);
